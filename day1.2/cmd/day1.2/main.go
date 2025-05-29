@@ -5,7 +5,6 @@ import (
     "io/ioutil"
     "strconv"
     "strings"
-    "sort"
     "slices"
 )
 
@@ -22,7 +21,6 @@ func readFile(fname string) (data string, err error) {
 }
 
 func getArrFromFile(data string) (arr [][]int, err error){
-
     lines := strings.Split(data, "\n")
     arr = make([][]int, (len(lines))-1)
     for i, _:= range lines{
@@ -51,12 +49,6 @@ func getNumberCount(arr [][]int)(result []NumCount, err error){
 		left[i] = arr[i][0]
 		right[i] = arr[i][1]
 	}
-	sort.Slice(left, func(i, j int) bool {
-    		return left[i] > left[j]
-	})
-	sort.Slice(right, func(i, j int) bool {
-    		return right[i] > right[j]
-	})
 	for i, _ := range left {
 		copy(rightCopy, right)
 		var numCount NumCount
