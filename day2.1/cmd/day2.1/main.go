@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strconv"
 	"strings"
+	"flag"
 )
 
 func readFile(fname string) (data string, err error) {
@@ -33,36 +34,36 @@ func getArrFromFile(data string) (arr [][]int, err error){
     return arr, nil
 }
 
-func isReportSafe(data []int) (isSafe bool, err error) {
+func isReportSafe(data []int, debug bool) (isSafe bool, err error) {
 	inc, dec := false, false
 	for i, _ := range data {
 		if i == ( len(data)) -1 { break }
 		result := data[i] - data[i+1]
-		//fmt.Println("Iteration", i)
-		//fmt.Println("Difference", result)
+		if debug == true { fmt.Println("Iteration", i) }
+		if debug == true { fmt.Println("Difference", result) }
 		if i == 0 {
 			if result == 0 { 
+			  	if debug == true { fmt.Println("Return: no difference") }
 				return false, nil
-				//fmt.Println("Break: no difference")
 			} else if result < 0 { 
 				inc = true 
-				//fmt.Println("Increasing")
+				if debug == true { fmt.Println("Increasing") }
 			} else { 
 				dec = true 
-				//fmt.Println("Decreasing")
+				if debug == true { fmt.Println("Decreasing") }
 			}
 		} 
 		if result == 0 { 
-			//fmt.Println("Continue: no difference")
+			if debug == true { fmt.Println("Return: no difference") }	
 			return false, nil 
 		} else if result < 0 {
 			if result < -3 || inc == false {
-				//fmt.Println("Unsafe:", result, inc, dec)
+				if debug == true { fmt.Println("Unsafe") }
 				return false, nil	
 			} 
 		} else { 
 			if result > 3 || dec == false {
-				//fmt.Println("Unsafe:", result, inc, dec)
+				if debug == true { fmt.Println("Unsafe") }
 				return false, nil
 			}	
 		}
@@ -70,27 +71,29 @@ func isReportSafe(data []int) (isSafe bool, err error) {
 	return true, nil
 }
 
-func analyzeReports(data [][]int) (safeAmount int, err error){
+func analyzeReports(data [][]int, debug bool) (safeAmount int, err error){
 	safeAmount = 0
 	for i, _ := range data {
-		//fmt.Println("----------------")
-		//fmt.Println("Report", data[i])
+		if debug==true { fmt.Println("----------------") }
+		if debug==true { fmt.Println("Report", data[i]) }
 		if data[i] == nil { break }
-		isReportSafe, err := isReportSafe(data[i])
+		isReportSafe, err := isReportSafe(data[i], debug)
 		if err != nil { panic(err) }
 		if isReportSafe == true { safeAmount++ }
-		//fmt.Println("Current safe amount:", safeAmount)
+		if debug==true { fmt.Println("Current safe amount:", safeAmount) }
 	}
 	return safeAmount, nil	
 }
 
 func main() {
+	debugPtr := flag.Bool("d", false, "debug mode")
+	flag.Parse()
 	filename := "data"
 	data, err := readFile(filename)
 	if err != nil { panic(err) }
 	arr, err := getArrFromFile(data)
 	if err != nil { panic(err) }
-	safeAmount, err := analyzeReports(arr)
+	safeAmount, err := analyzeReports(arr, *debugPtr)
 	fmt.Println("Amount of safe Reports:", safeAmount)
 }
 
